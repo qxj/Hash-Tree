@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.67])
+AC_PREREQ([2.65])
 AC_INIT(gsync, 0.1, junist@gmail.com)
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 

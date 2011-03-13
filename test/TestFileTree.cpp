@@ -1,5 +1,5 @@
 // @(#)TestFileTree.cpp
-// Time-stamp: <Julian Qian 2011-03-11 17:47:36>
+// Time-stamp: <Julian Qian 2011-03-13 16:58:45>
 // Copyright 2011 Julian Qian
 // Version: $Id: TestFileTree.cpp,v 0.0 2011/03/11 07:52:10 jqian Exp $
 
@@ -18,8 +18,8 @@ int main(int argc, char *argv[]){
         return -1;
     }
     FileHashTree ht;
-    // ht.build(argv[1]);
-    printf("root digest is %s.\n", ht.rootDigest().toString());
+    ht.build(argv[1]);
+    printf("root digest is %s.\n", ht.rootDigest().toString().c_str());
     return 0;
 }
 
