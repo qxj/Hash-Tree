@@ -1,11 +1,12 @@
 // @(#)HashNode.cpp
-// Time-stamp: <Julian Qian 2011-03-11 16:23:22>
+// Time-stamp: <Julian Qian 2011-03-17 16:27:39>
 // Copyright 2011 Julian Qian
 // Version: $Id: HashNode.cpp,v 0.0 2011/03/11 07:22:05 jqian Exp $
 
 #include <boost/uuid/sha1.hpp>
 #include <sstream>
 
+#include "util_marshal.h"
 #include "HashNode.h"
 
 using namespace boost::uuids::detail;
@@ -16,9 +17,25 @@ const std::string
 DigestType::toString() const{
     std::ostringstream oss;
     for (int i = 0; i < N; ++i) {
-        oss << std::ios::hex << digest_[i];
+        oss << std::hex << digest_[i];
     }
     return oss.str();
+}
+
+char*
+DigestType::unserilize(char* p){
+    for (int i = 0; i < N; ++i) {
+        p = pop_uint32(p, digest_[i]);
+    }
+    return p;
+}
+
+char*
+DigestType::serilize(char* p){
+    for (int i = 0; i < N; ++i) {
+        p = push_uint32(p, digest_[i]);
+    }
+    return p;
 }
 
 int
@@ -49,3 +66,17 @@ HashNode::digestChildren(const HashNode* l, const HashNode* r){
     return -1;
 }
 
+// marshal & unmarshal
+char*
+HashNode::unserilize(char* p){
+    p = pop_char(p, type_);
+    p = digest_.unserilize(p);
+    return p;
+}
+
+char*
+HashNode::serilize(char* p){
+    p = push_char(p, type_);
+    p = digest_.serilize(p);
+    return p;
+}

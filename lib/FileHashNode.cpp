@@ -1,10 +1,11 @@
 // @(#)FileHashNode.cpp
-// Time-stamp: <Julian Qian 2011-03-11 17:03:54>
+// Time-stamp: <Julian Qian 2011-03-17 16:20:05>
 // Copyright 2011 Julian Qian
 // Version: $Id: FileHashNode.cpp,v 0.0 2011/03/11 05:22:50 jqian Exp $
 
 #include <stdlib.h>
 #include "Errors.h"
+#include "util_marshal.h"
 #include "FileHashNode.h"
 
 using std::string;
@@ -51,4 +52,30 @@ DTLeaf::init(const char* filename,
         sumstr += itr->digest().toString();
     }
     digest_.process(sumstr.c_str(), sumstr.length());
+}
+
+char*
+DTLeaf::unserilize(char* p){
+    p = HashNode::unserilize(p);
+    unsigned int len;
+    p = pop_uint32(p, len);
+    blocks_.reserve(len);
+    for (int i = 0; i < len; ++i) {
+        DTBlock block;
+        p = block.unserilize(p);
+        blocks_.push_back(block);
+    }
+    return p;
+}
+
+char*
+DTLeaf::serilize(char* p){
+    p = HashNode::serilize(p);
+    unsigned int len = blocks_.size();
+    p = push_uint32(p, len);
+    for (BlockList::iterator itr = blocks_.begin();
+         itr != blocks_.end(); ++ itr) {
+        p = itr->serilize(p);
+    }
+    return p;
 }

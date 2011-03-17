@@ -1,5 +1,5 @@
 /* @(#)HashNode.h -*- mode: c++ -*-
- * Time-stamp: <Julian Qian 2011-03-11 16:30:10>
+ * Time-stamp: <Julian Qian 2011-03-17 16:16:21>
  * Copyright 2011 Julian Qian
  * Version: $Id: HashNode.h,v 0.0 2011/03/11 05:05:28 jqian Exp $
  */
@@ -63,12 +63,34 @@ public:
         }
         return true;
     }
-
+    bool operator!=(const DigestType& dt){
+        if(this != &dt){
+            for (int i = 0; i < N; ++i) {
+                if(digest_[i] != dt.digest_[i]){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     digest_type& digest() { return digest_; }
 
     int process(const char* buf, const size_t len);
 
     const std::string toString() const;
+
+    // serilize & unserilize
+    char* unserilize(char* str);
+    char* serilize(char* str);
+
+    bool empty(){
+        for (int i = 0; i < N; ++i) {
+            if(digest_[i] != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 private:
     digest_type digest_;
 };
@@ -76,16 +98,22 @@ private:
 class HashNode {
 public:
     enum { NODE, LEAF, BLOCK };
-    explicit HashNode(int type)
+    explicit HashNode(char type)
         : digest_(), type_(type) {}
     virtual ~HashNode() {}
-    bool isLeaf(){ return type_ == LEAF; }
+    bool type(){ return type_; }
     DigestType digest(){ return digest_; }
     void digest(DigestType& dt){ digest_ = dt; }
     int digestChildren(const HashNode* l, const HashNode* r);
+
+    // serilize & unserilize
+    char* serilize(char* str);
+    char* unserilize(char* str);
+
+    bool empty(){ return digest_.empty(); }
 protected:
     DigestType digest_;
-    int type_;
+    char type_;
 };
 
 #endif /* _HASHNODE_H */
