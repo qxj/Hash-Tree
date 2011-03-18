@@ -1,5 +1,5 @@
 // @(#)FileHashTree.cpp
-// Time-stamp: <Julian Qian 2011-03-17 17:33:24>
+// Time-stamp: <Julian Qian 2011-03-18 16:54:30>
 // Copyright 2011 Julian Qian
 // Version: $Id: FileHashTree.cpp,v 0.0 2011/03/11 06:31:20 jqian Exp $
 
@@ -99,7 +99,8 @@ FileHashTree::unserilize(char* p){
                 tree_[i] = NULL;
             }else{
                 tree_[i] = new DTLeaf;
-                *(tree_[i]) = leaf;
+                DTLeaf* lptr = dynamic_cast<DTLeaf*>(tree_[i]);
+                *lptr = leaf;
             }
         }
     }
@@ -157,8 +158,11 @@ FileHashTreeManager::compareTrees_(HashNode* dst[], HashNode* src[], int ptr){
         DTLeaf* dstLeaf = dynamic_cast<DTLeaf*>(dst[ptr]);
         DTLeaf* srcLeaf = dynamic_cast<DTLeaf*>(src[ptr]);
 
-        int offset = (ptr - FileHashTree::TREE_LEAVES_PTR) *
+        unsigned int baseoff = (ptr - FileHashTree::TREE_LEAVES_PTR) *
             (FileHashTree::FILE_TRUNK_COUNT);
+        unsigned int offset = baseoff;
+
+        DTLeaf::BlockInfo& srclb = srcLeaf->lastblk();
 
         if(srcLeaf != NULL){
             DTLeaf::BlockList& srcBlocks = srcLeaf->blocks();
@@ -183,6 +187,11 @@ FileHashTreeManager::compareTrees_(HashNode* dst[], HashNode* src[], int ptr){
             for (; srcItr != srcBlocks.end(); ++srcItr) {
                 offsets_.push_back(offset * DTBlock::DATA_BLOCK_SIZE);
                 ++ offset;
+            }
+            // read src end
+            if(offset >= srclb.ptr + baseoff){
+                lastblk_.ptr = (srclb.ptr + baseoff) * DTBlock::DATA_BLOCK_SIZE;
+                lastblk_.length = srclb.length;
             }
         }
     }else if(dst[ptr] || dst[ptr]){

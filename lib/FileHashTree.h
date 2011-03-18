@@ -1,5 +1,5 @@
 /* @(#)FileHashTree.h -*- mode: c++ -*-
- * Time-stamp: <Julian Qian 2011-03-17 17:25:44>
+ * Time-stamp: <Julian Qian 2011-03-17 18:17:36>
  * Copyright 2011 Julian Qian
  * Version: $Id: FileHashTree.h,v 0.0 2011/03/11 04:57:55 jqian Exp $
  */
@@ -40,13 +40,18 @@ private:
 
 class FileHashTreeManager {
 public:
+    FileHashTreeManager()
+        : lastblk_(), offsets_() {}
+
     int diff(FileHashTree* dst, FileHashTree* src);
 
-    typedef std::vector<int> OffsetList;
+    typedef std::vector<unsigned int> OffsetList;
     OffsetList& offsets(){ return offsets_; }
+    DTLeaf::BlockInfo& lastblk() { return lastblk_; }
 private:
     void compareTrees_(HashNode* dst[], HashNode* src[], int ptr);
 
+    DTLeaf::BlockInfo lastblk_; // if lastblk_.ptr != 0, reach source end.
     OffsetList offsets_;
 };
 
