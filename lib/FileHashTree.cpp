@@ -1,5 +1,5 @@
 // @(#)FileHashTree.cpp
-// Time-stamp: <Julian Qian 2011-04-19 10:02:20>
+// Time-stamp: <Julian Qian 2011-04-19 10:40:56>
 // Copyright 2011 Julian Qian
 // Version: $Id: FileHashTree.cpp,v 0.0 2011/03/11 06:31:20 jqian Exp $
 
@@ -41,7 +41,7 @@ FileHashTree::FileHashTree(unsigned blockKiloSize,
       trunksCount_(trunksCount),
       tree_(NULL){
     unsigned cnt = fileKiloSize / (blockKiloSize * trunksCount);
-    nodesCount_ = pow2(cnt) -1; // nodes count = height^2 -1
+    nodesCount_ = pow2(cnt) * 2 -1; // nodes count = height^2 -1
 
     tree_ = (HashNode**)malloc(sizeof(HashNode*) * nodesCount_);
     for (int i = 0; i < nodesCount_; ++i) {
@@ -102,7 +102,7 @@ FileHashTree::build(const char* file){
             }
         }
         DTLeaf* leaf = new DTLeaf(blockSize_);
-        tree_[(nodesCount_/2 - 1) + i] = leaf;
+        tree_[(nodesCount_/2) + i] = leaf;
 
         grp.add_thread(new boost::thread(boost::bind(&DTLeaf::init, leaf, file, offset, length)));
     }

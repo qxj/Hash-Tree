@@ -1,5 +1,5 @@
 // @(#)TestSync.cpp
-// Time-stamp: <Julian Qian 2011-04-18 17:49:14>
+// Time-stamp: <Julian Qian 2011-04-19 11:56:25>
 // Copyright 2011 Julian Qian
 // Version: $Id: TestSync.cpp,v 0.0 2011/03/17 09:17:45 jqian Exp $
 
@@ -75,11 +75,13 @@ int main(int argc, char *argv[]){
     buf = (char*)malloc(blksize);
     for (itr = offs.begin(); itr != offs.end(); ++ itr) {
         if(*itr == lastblk.ptr){ // read end
+            lseek(f1, lastblk.ptr, SEEK_SET);
             len = read(f1, buf, lastblk.length);
             lseek(f2, lastblk.ptr, SEEK_SET);
             write(f2, buf, lastblk.length);
             ftruncate(f2, lastblk.ptr + lastblk.length);
         }else{
+            lseek(f1, *itr, SEEK_SET);
             len = read(f1, buf, blksize);
             lseek(f2, *itr, SEEK_SET);
             write(f2, buf, blksize);

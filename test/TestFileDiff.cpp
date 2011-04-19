@@ -1,5 +1,5 @@
 // @(#)TestFileDiff.cpp
-// Time-stamp: <Julian Qian 2011-04-18 17:49:55>
+// Time-stamp: <Julian Qian 2011-04-19 11:41:48>
 // Copyright 2011 Julian Qian
 // Version: $Id: TestFileDiff.cpp,v 0.0 2011/03/16 08:11:15 jqian Exp $
 
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
     printf("%d diff blocks. offset: \n", ol.size());
     for (FileHashTreeManager::OffsetList::iterator itr = ol.begin();
          itr != ol.end(); ++itr) {
-        printf("%d ", *itr * 512 * 1024);
+        printf("%u ", *itr);
     }
     printf("\n");
 
