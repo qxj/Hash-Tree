@@ -1,5 +1,5 @@
 // @(#)TestSync.cpp
-// Time-stamp: <Julian Qian 2011-03-18 15:26:47>
+// Time-stamp: <Julian Qian 2011-04-18 17:49:14>
 // Copyright 2011 Julian Qian
 // Version: $Id: TestSync.cpp,v 0.0 2011/03/17 09:17:45 jqian Exp $
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
     FileHashTree ht1;
     FileHashTree ht2;
 
-    char* buf = (char*)malloc(FileHashTree::MAX_SERILIZE_SIZE);
+    char* buf = (char*)malloc(ht1.maxSerilizeSize());
 
     if(read_fht(fht1, buf) > 0){
         ht1.unserilize(buf);
@@ -71,7 +71,8 @@ int main(int argc, char *argv[]){
     int len;
     int f1 = open(file1, O_RDONLY);
     int f2 = open(file2, O_WRONLY);
-    buf = (char*)malloc(DTBlock::DATA_BLOCK_SIZE);
+    int blksize = 512*1024;
+    buf = (char*)malloc(blksize);
     for (itr = offs.begin(); itr != offs.end(); ++ itr) {
         if(*itr == lastblk.ptr){ // read end
             len = read(f1, buf, lastblk.length);
@@ -79,9 +80,9 @@ int main(int argc, char *argv[]){
             write(f2, buf, lastblk.length);
             ftruncate(f2, lastblk.ptr + lastblk.length);
         }else{
-            len = read(f1, buf, DTBlock::DATA_BLOCK_SIZE);
+            len = read(f1, buf, blksize);
             lseek(f2, *itr, SEEK_SET);
-            write(f2, buf, DTBlock::DATA_BLOCK_SIZE);
+            write(f2, buf, blksize);
         }
     }
     free(buf);

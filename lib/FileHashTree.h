@@ -1,5 +1,5 @@
 /* @(#)FileHashTree.h -*- mode: c++ -*-
- * Time-stamp: <Julian Qian 2011-03-17 18:17:36>
+ * Time-stamp: <Julian Qian 2011-04-19 09:57:48>
  * Copyright 2011 Julian Qian
  * Version: $Id: FileHashTree.h,v 0.0 2011/03/11 04:57:55 jqian Exp $
  */
@@ -12,16 +12,14 @@
 class FileHashTree {
 public:
     enum {
-        TREE_NODES_COUNT = 31,
-        TREE_LEAVES_PTR = 15,
-        FILE_TRUNK_COUNT = 256,
-        MAX_SERILIZE_SIZE = 90000,
-        MAX_FILE_SIZE = 2147483648U // 2GB
+        KILO_SIZE = 1024
     };
 
     friend class FileHashTreeManager;
 
-    FileHashTree();
+    FileHashTree(unsigned blockKiloSize = 512,
+                 unsigned fileKiloSize = 2097152,
+                 unsigned trunksCount = 256);
     ~FileHashTree();
 
     // generate hash tree
@@ -30,12 +28,21 @@ public:
     char* unserilize(char* p);
     // serilize hash tree
     char* serilize(char* p);
+    // fetch entitle file hash tree length
     static unsigned int getLength(char* p);
     //
     DigestType rootDigest();
+    // approximately size
+    unsigned maxSerilizeSize() const {
+        return nodesCount_ * sizeof(DTNode) + (nodesCount_/2) * trunksCount_ * sizeof(DTBlock);
+    }
 
 private:
-    HashNode* tree_[TREE_NODES_COUNT];         // 4-level perfect binary tree
+    HashNode** tree_;         // ptr to a perfect binary tree
+
+    unsigned blockSize_;
+    unsigned trunksCount_;
+    unsigned nodesCount_;
 };
 
 class FileHashTreeManager {
@@ -49,7 +56,8 @@ public:
     OffsetList& offsets(){ return offsets_; }
     DTLeaf::BlockInfo& lastblk() { return lastblk_; }
 private:
-    void compareTrees_(HashNode* dst[], HashNode* src[], int ptr);
+    void compareTrees_(HashNode* dst[], HashNode* src[], int ptr,
+                       unsigned nodes, unsigned trunks, unsigned blksize);
 
     DTLeaf::BlockInfo lastblk_; // if lastblk_.ptr != 0, reach source end.
     OffsetList offsets_;

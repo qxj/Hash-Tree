@@ -1,5 +1,5 @@
 /* @(#)Errors.h -*- mode: c++ -*-
- * Time-stamp: <Julian Qian 2011-03-17 14:18:53>
+ * Time-stamp: <Julian Qian 2011-04-18 17:35:45>
  * Copyright 2011 Julian Qian
  * Version: $Id: Errors.h,v 0.0 2011/03/11 05:32:04 jqian Exp $
  */
@@ -14,6 +14,7 @@
 #define EC_OK      0
 #define EC_ESYS    100           // sys error
 #define EC_EMATCH  101           // size mismatch
+#define EC_ETYPE   102           // wrong type
 
 #define EC_NO_RETURN(FMT, ...)   LERROR(FMT, ##__VA_ARGS__); return;
 #define EC_RETURN(VAL, FMT, ...) LERROR(FMT, ##__VA_ARGS__); return VAL;

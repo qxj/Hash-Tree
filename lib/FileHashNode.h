@@ -1,5 +1,5 @@
 /* @(#)FileHashNode.h -*- mode: c++ -*-
- * Time-stamp: <Julian Qian 2011-03-17 18:00:27>
+ * Time-stamp: <Julian Qian 2011-04-19 10:03:06>
  * Copyright 2011 Julian Qian
  * Version: $Id: FileHashNode.h,v 0.0 2011/03/11 05:22:15 jqian Exp $
  */
@@ -14,7 +14,7 @@
 
 class DTBlock: public HashNode {
 public:
-    enum { DATA_BLOCK_SIZE = 524288 }; // 512KB
+    // enum { DATA_BLOCK_SIZE = 524288 }; // 512KB
     DTBlock()
         : HashNode(BLOCK) {}
 };
@@ -27,10 +27,12 @@ public:
         unsigned int ptr;
         unsigned int length;
     };
-    DTLeaf()
+
+    explicit DTLeaf(const unsigned blockSize)
         : HashNode(LEAF),
           blocks_(),
-          lastblk_(){}
+          lastblk_(),
+          blockSize_(blockSize){}
 
     void init(const char* filename,
               const uint32_t offset,
@@ -46,6 +48,7 @@ public:
 private:
     BlockList blocks_;
     BlockInfo lastblk_;
+    unsigned blockSize_;
 };
 
 class DTNode: public HashNode {

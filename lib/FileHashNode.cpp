@@ -1,5 +1,5 @@
 // @(#)FileHashNode.cpp
-// Time-stamp: <Julian Qian 2011-03-17 17:55:44>
+// Time-stamp: <Julian Qian 2011-04-18 17:17:52>
 // Copyright 2011 Julian Qian
 // Version: $Id: FileHashNode.cpp,v 0.0 2011/03/11 05:22:50 jqian Exp $
 
@@ -20,11 +20,11 @@ DTLeaf::init(const char* filename,
         EC_NO_RETURN("failed to seek offset, %s.",
                      strerror(errno));
     }
-    int count = length / DTBlock::DATA_BLOCK_SIZE;
-    char* buffer = (char*)malloc(DTBlock::DATA_BLOCK_SIZE);
+    int count = length / blockSize_;
+    char* buffer = (char*)malloc(blockSize_);
     for (int i = 0; i <= count; ++i) {
-        size_t rlen = fread(buffer, 1, DTBlock::DATA_BLOCK_SIZE, fd);
-        if(rlen < DTBlock::DATA_BLOCK_SIZE){
+        size_t rlen = fread(buffer, 1, blockSize_, fd);
+        if(rlen < blockSize_){
             if(feof(fd)){       // end of file
                 // store the last offset and length
                 lastblk_.ptr = i;

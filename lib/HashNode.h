@@ -1,5 +1,5 @@
 /* @(#)HashNode.h -*- mode: c++ -*-
- * Time-stamp: <Julian Qian 2011-03-17 16:16:21>
+ * Time-stamp: <Julian Qian 2011-04-18 14:57:26>
  * Copyright 2011 Julian Qian
  * Version: $Id: HashNode.h,v 0.0 2011/03/11 05:05:28 jqian Exp $
  */
@@ -73,7 +73,9 @@ public:
         }
         return false;
     }
-    digest_type& digest() { return digest_; }
+    operator digest_type& () {
+        return digest_;
+    }
 
     int process(const char* buf, const size_t len);
 

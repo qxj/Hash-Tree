@@ -1,5 +1,5 @@
 // @(#)TestSerilize.cpp
-// Time-stamp: <Julian Qian 2011-03-17 17:25:58>
+// Time-stamp: <Julian Qian 2011-04-19 09:53:50>
 // Copyright 2011 Julian Qian
 // Version: $Id: TestSerilize.cpp,v 0.0 2011/03/17 07:39:57 jqian Exp $
 
@@ -13,7 +13,11 @@ int main(int argc, char *argv[]){
         printf("usage:\n\ttestsl <file name>\n");
         return -1;
     }
-    char* buf = (char*)malloc(FileHashTree::MAX_SERILIZE_SIZE);
+    const unsigned blkKb = 512;
+    const unsigned fileKb = 2 * 1024 * 1024;
+    const unsigned trkCnt = 256;
+    FileHashTree ht(blkKb, fileKb, trkCnt);
+    char* buf = (char*)malloc(ht.maxSerilizeSize());
 
     const char* file = argv[1];
     if(access(file, R_OK)){
@@ -21,7 +25,6 @@ int main(int argc, char *argv[]){
         return -1;
     }
 
-    FileHashTree ht;
     ht.build(file);
     char* p = ht.serilize(buf);
     unsigned int len = p - buf;
@@ -57,7 +60,7 @@ int main(int argc, char *argv[]){
     printf("%d diff blocks. offset: \n", ol.size());
     for (FileHashTreeManager::OffsetList::iterator itr = ol.begin();
          itr != ol.end(); ++itr) {
-        printf("%d ", *itr * DTBlock::DATA_BLOCK_SIZE);
+        printf("%d ", *itr * (blkKb * 1024));
     }
     printf("\n");
 #endif
