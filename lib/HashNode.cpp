@@ -1,5 +1,5 @@
 // @(#)HashNode.cpp
-// Time-stamp: <Julian Qian 2011-03-17 16:27:39>
+// Time-stamp: <Julian Qian 2011-04-20 18:00:58>
 // Copyright 2011 Julian Qian
 // Version: $Id: HashNode.cpp,v 0.0 2011/03/11 07:22:05 jqian Exp $
 
@@ -69,14 +69,12 @@ HashNode::digestChildren(const HashNode* l, const HashNode* r){
 // marshal & unmarshal
 char*
 HashNode::unserilize(char* p){
-    p = pop_char(p, type_);
     p = digest_.unserilize(p);
     return p;
 }
 
 char*
 HashNode::serilize(char* p){
-    p = push_char(p, type_);
     p = digest_.serilize(p);
     return p;
 }

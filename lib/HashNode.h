@@ -1,5 +1,5 @@
 /* @(#)HashNode.h -*- mode: c++ -*-
- * Time-stamp: <Julian Qian 2011-04-18 14:57:26>
+ * Time-stamp: <Julian Qian 2011-04-20 17:58:45>
  * Copyright 2011 Julian Qian
  * Version: $Id: HashNode.h,v 0.0 2011/03/11 05:05:28 jqian Exp $
  */
@@ -99,11 +99,9 @@ private:
 
 class HashNode {
 public:
-    enum { NODE, LEAF, BLOCK };
-    explicit HashNode(char type)
-        : digest_(), type_(type) {}
+    explicit HashNode()
+        : digest_() {}
     virtual ~HashNode() {}
-    bool type(){ return type_; }
     DigestType digest(){ return digest_; }
     void digest(DigestType& dt){ digest_ = dt; }
     int digestChildren(const HashNode* l, const HashNode* r);
@@ -115,7 +113,6 @@ public:
     bool empty(){ return digest_.empty(); }
 protected:
     DigestType digest_;
-    char type_;
 };
 
 #endif /* _HASHNODE_H */
