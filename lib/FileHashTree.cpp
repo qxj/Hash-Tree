@@ -1,5 +1,5 @@
 // @(#)FileHashTree.cpp
-// Time-stamp: <Julian Qian 2011-04-19 10:40:56>
+// Time-stamp: <Julian Qian 2011-04-20 17:32:00>
 // Copyright 2011 Julian Qian
 // Version: $Id: FileHashTree.cpp,v 0.0 2011/03/11 06:31:20 jqian Exp $
 
@@ -86,15 +86,15 @@ FileHashTree::build(const char* file){
     }
     // assert(statb.st_size < MAX_FILE_SIZE);
 
-    unsigned filesize = statb.st_size;
-    int trunksize = trunksCount_ * blockSize_;
-    int count = filesize / trunksize;
+    size_t filesize = statb.st_size;
+    size_t trunksize = trunksCount_ * blockSize_;
+    unsigned count = filesize / trunksize;
 
     // calc leaf digest
     boost::thread_group grp;
     for (int i = 0; i <= count; ++i) {
-        int offset = i * trunksize;
-        int length = trunksize;
+        off_t offset = i * trunksize;
+        size_t length = trunksize;
         if(i == count){         // final trunk
             length = filesize - i * trunksize;
             if(length == 0){
@@ -197,8 +197,8 @@ FileHashTreeManager::compareTrees_(HashNode* dst[], HashNode* src[], int ptr,
         DTLeaf* dstLeaf = dynamic_cast<DTLeaf*>(dst[ptr]);
         DTLeaf* srcLeaf = dynamic_cast<DTLeaf*>(src[ptr]);
 
-        unsigned int baseoff = (ptr - (nodes/2)) * trunks;
-        unsigned int offset = baseoff;
+        off_t baseoff = (ptr - (nodes/2)) * trunks;
+        off_t offset = baseoff;
 
         DTLeaf::BlockInfo& srclb = srcLeaf->lastblk();
 

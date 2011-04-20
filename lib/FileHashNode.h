@@ -1,5 +1,5 @@
 /* @(#)FileHashNode.h -*- mode: c++ -*-
- * Time-stamp: <Julian Qian 2011-04-19 10:03:06>
+ * Time-stamp: <Julian Qian 2011-04-20 17:36:31>
  * Copyright 2011 Julian Qian
  * Version: $Id: FileHashNode.h,v 0.0 2011/03/11 05:22:15 jqian Exp $
  */
@@ -7,7 +7,7 @@
 #ifndef _FILEHASHNODE_H
 #define _FILEHASHNODE_H 1
 
-#include <stdint.h>
+#include <unistd.h>
 #include <vector>
 
 #include "HashNode.h"
@@ -24,8 +24,8 @@ public:
     struct BlockInfo {
         BlockInfo()
             : ptr(0), length(0) {}
-        unsigned int ptr;
-        unsigned int length;
+        unsigned ptr;
+        unsigned length;
     };
 
     explicit DTLeaf(const unsigned blockSize)
@@ -35,8 +35,8 @@ public:
           blockSize_(blockSize){}
 
     void init(const char* filename,
-              const uint32_t offset,
-              const uint32_t length);
+              off_t offset,
+              unsigned length);
 
     typedef std::vector<DTBlock> BlockList;
     BlockList& blocks(){ return blocks_; }

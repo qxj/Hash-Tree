@@ -1,5 +1,5 @@
 /* @(#)FileHashTree.h -*- mode: c++ -*-
- * Time-stamp: <Julian Qian 2011-04-19 09:57:48>
+ * Time-stamp: <Julian Qian 2011-04-20 17:31:55>
  * Copyright 2011 Julian Qian
  * Version: $Id: FileHashTree.h,v 0.0 2011/03/11 04:57:55 jqian Exp $
  */
@@ -29,7 +29,7 @@ public:
     // serilize hash tree
     char* serilize(char* p);
     // fetch entitle file hash tree length
-    static unsigned int getLength(char* p);
+    static unsigned getLength(char* p);
     //
     DigestType rootDigest();
     // approximately size
@@ -52,7 +52,7 @@ public:
 
     int diff(FileHashTree* dst, FileHashTree* src);
 
-    typedef std::vector<unsigned int> OffsetList;
+    typedef std::vector<size_t> OffsetList;
     OffsetList& offsets(){ return offsets_; }
     DTLeaf::BlockInfo& lastblk() { return lastblk_; }
 private:

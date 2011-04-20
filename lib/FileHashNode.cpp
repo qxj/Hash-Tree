@@ -1,5 +1,5 @@
 // @(#)FileHashNode.cpp
-// Time-stamp: <Julian Qian 2011-04-18 17:17:52>
+// Time-stamp: <Julian Qian 2011-04-20 17:34:25>
 // Copyright 2011 Julian Qian
 // Version: $Id: FileHashNode.cpp,v 0.0 2011/03/11 05:22:50 jqian Exp $
 
@@ -12,15 +12,15 @@ using std::string;
 
 void
 DTLeaf::init(const char* filename,
-             const uint32_t offset,
-             const uint32_t length){
+             off_t offset,
+             unsigned length){
     // read file
     FILE* fd = fopen(filename, "r");
     if(fseek(fd, offset, SEEK_SET)){
         EC_NO_RETURN("failed to seek offset, %s.",
                      strerror(errno));
     }
-    int count = length / blockSize_;
+    unsigned count = length / blockSize_;
     char* buffer = (char*)malloc(blockSize_);
     for (int i = 0; i <= count; ++i) {
         size_t rlen = fread(buffer, 1, blockSize_, fd);

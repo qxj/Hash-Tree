@@ -1,5 +1,5 @@
 // @(#)TestSerilize.cpp
-// Time-stamp: <Julian Qian 2011-04-19 09:53:50>
+// Time-stamp: <Julian Qian 2011-04-19 16:08:34>
 // Copyright 2011 Julian Qian
 // Version: $Id: TestSerilize.cpp,v 0.0 2011/03/17 07:39:57 jqian Exp $
 
@@ -9,13 +9,24 @@
 #include "FileHashTree.h"
 
 int main(int argc, char *argv[]){
-    if(argc != 2){
+    if(argc < 2){
         printf("usage:\n\ttestsl <file name>\n");
+        printf("usage:\n\ttestsl <file name> <block MB size =1MB> <max file GB size =2GB> <trunk count =256>\n");
         return -1;
     }
-    const unsigned blkKb = 512;
-    const unsigned fileKb = 2 * 1024 * 1024;
-    const unsigned trkCnt = 256;
+    unsigned blkKb = 1024;
+    unsigned fileKb = 2 * 1024 * 1024;
+    unsigned trkCnt = 256;
+    if(argc >2){
+        blkKb = atoi(argv[2]) * 1024;
+        if(argc > 3){
+            fileKb = atoi(argv[3]) * 1024 * 1024;
+            if(argc > 4){
+                trkCnt = atoi(argv[4]);
+            }
+        }
+    }
+
     FileHashTree ht(blkKb, fileKb, trkCnt);
     char* buf = (char*)malloc(ht.maxSerilizeSize());
 
