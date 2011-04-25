@@ -1,5 +1,5 @@
 // @(#)FileHashTree.cpp
-// Time-stamp: <Julian Qian 2011-04-20 17:32:00>
+// Time-stamp: <Julian Qian 2011-04-25 10:59:36>
 // Copyright 2011 Julian Qian
 // Version: $Id: FileHashTree.cpp,v 0.0 2011/03/11 06:31:20 jqian Exp $
 
@@ -120,23 +120,22 @@ FileHashTree::unserilize(char* p){
     p = pop_uint32(p, blockSize_);
     for (int i = 0; i < nodesCount_; ++i) {
         if(i < nodesCount_/2){ // nodes
-            DTNode node;
-            p = node.unserilize(p);
-            if(node.empty()){
+            DTNode* node = new DTNode;
+            p = node->unserilize(p);
+            if(node->empty()){
                 tree_[i] = NULL;
+                delete node;
             }else{
-                tree_[i] = new DTNode; // alloc
-                *(tree_[i]) = node;
+                tree_[i] = static_cast<HashNode*>(node);
             }
         }else{                   // leaves
-            DTLeaf leaf(blockSize_);
-            p = leaf.unserilize(p);
-            if(leaf.empty()){
+            DTLeaf *leaf = new DTLeaf(blockSize_);
+            p = leaf->unserilize(p);
+            if(leaf->empty()){
                 tree_[i] = NULL;
+                delete leaf;
             }else{
-                tree_[i] = new DTLeaf(blockSize_);
-                DTLeaf* lptr = dynamic_cast<DTLeaf*>(tree_[i]);
-                *lptr = leaf;
+                tree_[i] = static_cast<HashNode*>(leaf);
             }
         }
     }
@@ -157,7 +156,7 @@ FileHashTree::serilize(char* p){
                 DTNode node;
                 p = node.serilize(p);
             }else{
-                DTNode* node = dynamic_cast<DTNode*>(tree_[i]);
+                DTNode *node = static_cast<DTNode*>(tree_[i]);
                 p = node->serilize(p);
             }
         }else{                   // leaves
@@ -165,8 +164,8 @@ FileHashTree::serilize(char* p){
                 DTLeaf leaf(blockSize_);
                 p = leaf.serilize(p);
             }else{
-                DTLeaf* node = dynamic_cast<DTLeaf*>(tree_[i]);
-                p = node->serilize(p);
+                DTLeaf* leaf = static_cast<DTLeaf*>(tree_[i]);
+                p = leaf->serilize(p);
             }
         }
     }
@@ -194,8 +193,8 @@ FileHashTreeManager::compareTrees_(HashNode* dst[], HashNode* src[], int ptr,
                                    unsigned nodes, unsigned trunks, unsigned blksize){
     if(ptr >= nodes/2){
         // compare leaves
-        DTLeaf* dstLeaf = dynamic_cast<DTLeaf*>(dst[ptr]);
-        DTLeaf* srcLeaf = dynamic_cast<DTLeaf*>(src[ptr]);
+        DTLeaf* dstLeaf = static_cast<DTLeaf*>(dst[ptr]);
+        DTLeaf* srcLeaf = static_cast<DTLeaf*>(src[ptr]);
 
         off_t baseoff = (ptr - (nodes/2)) * trunks;
         off_t offset = baseoff;
