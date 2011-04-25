@@ -1,5 +1,5 @@
 /* @(#)HashNode.h -*- mode: c++ -*-
- * Time-stamp: <Julian Qian 2011-04-20 17:58:45>
+ * Time-stamp: <Julian Qian 2011-04-25 17:55:08>
  * Copyright 2011 Julian Qian
  * Version: $Id: HashNode.h,v 0.0 2011/03/11 05:05:28 jqian Exp $
  */
@@ -40,12 +40,12 @@ public:
         }
         return *this;
     }
-    DigestType& operator=(digest_type& dt){
+    DigestType& operator=(const digest_type& dt){
         for (int i = 0; i < N; ++i) {
             digest_[i] = dt[i];
         }
     }
-    bool operator==(const DigestType& dt){
+    bool operator==(const DigestType& dt) const {
         if(this != &dt){
             for (int i = 0; i < N; ++i) {
                 if(digest_[i] != dt.digest_[i]){
@@ -55,7 +55,7 @@ public:
         }
         return true;
     }
-    bool operator==(digest_type& dt){
+    bool operator==(const digest_type& dt) const {
         for (int i = 0; i < N; ++i) {
             if(digest_[i] != dt[i]){
                 return false;
@@ -63,7 +63,7 @@ public:
         }
         return true;
     }
-    bool operator!=(const DigestType& dt){
+    bool operator!=(const DigestType& dt) const {
         if(this != &dt){
             for (int i = 0; i < N; ++i) {
                 if(digest_[i] != dt.digest_[i]){
@@ -73,7 +73,7 @@ public:
         }
         return false;
     }
-    operator digest_type& () {
+    operator const digest_type& () const {
         return digest_;
     }
 
@@ -102,7 +102,7 @@ public:
     explicit HashNode()
         : digest_() {}
     virtual ~HashNode() {}
-    DigestType digest(){ return digest_; }
+    const DigestType digest() const { return digest_; }
     void digest(DigestType& dt){ digest_ = dt; }
     int digestChildren(const HashNode* l, const HashNode* r);
 

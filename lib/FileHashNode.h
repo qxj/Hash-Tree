@@ -1,5 +1,5 @@
 /* @(#)FileHashNode.h -*- mode: c++ -*-
- * Time-stamp: <Julian Qian 2011-04-20 18:00:12>
+ * Time-stamp: <Julian Qian 2011-04-25 17:50:26>
  * Copyright 2011 Julian Qian
  * Version: $Id: FileHashNode.h,v 0.0 2011/03/11 05:22:15 jqian Exp $
  */
@@ -38,8 +38,8 @@ public:
               unsigned length);
 
     typedef std::vector<DTBlock> BlockList;
-    BlockList& blocks(){ return blocks_; }
-    BlockInfo& lastblk() { return lastblk_; }
+    const BlockList& blocks() const { return blocks_; }
+    const BlockInfo& lastblk() const { return lastblk_; }
 
     // override
     char* unserilize(char* p);

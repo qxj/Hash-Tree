@@ -1,5 +1,5 @@
 // @(#)FileHashTree.cpp
-// Time-stamp: <Julian Qian 2011-04-25 10:59:36>
+// Time-stamp: <Julian Qian 2011-04-25 17:55:29>
 // Copyright 2011 Julian Qian
 // Version: $Id: FileHashTree.cpp,v 0.0 2011/03/11 06:31:20 jqian Exp $
 
@@ -9,6 +9,7 @@
 #include <assert.h>
 
 #include <boost/thread/thread.hpp>
+#include <boost/cast.hpp>
 
 #include "Errors.h"
 #include "util_marshal.h"
@@ -51,7 +52,10 @@ FileHashTree::FileHashTree(unsigned blockKiloSize,
 
 FileHashTree::~FileHashTree(){
     for (int i = 0; i < nodesCount_; ++i) {
-        if(tree_[i]) delete tree_[i];
+        if(tree_[i]) {
+            delete tree_[i];
+            tree_[i] = NULL;
+        }
     }
     if(tree_){
         free(tree_);
@@ -73,8 +77,9 @@ static void build_binary_tree(HashNode* root[], unsigned cnt, int ptr){
         build_binary_tree(root, cnt, rptr);
     }
     if(root[lptr] || root[rptr]){
-        root[ptr] = new DTNode;
-        root[ptr]->digestChildren(root[lptr], root[rptr]);
+        DTNode* node = new DTNode;
+        node->digestChildren(root[lptr], root[rptr]);
+        root[ptr] = static_cast<HashNode*>(node);
     }
 }
 
@@ -88,7 +93,7 @@ FileHashTree::build(const char* file){
 
     size_t filesize = statb.st_size;
     size_t trunksize = trunksCount_ * blockSize_;
-    unsigned count = filesize / trunksize;
+    size_t count = filesize / trunksize;
 
     // calc leaf digest
     boost::thread_group grp;
@@ -102,7 +107,7 @@ FileHashTree::build(const char* file){
             }
         }
         DTLeaf* leaf = new DTLeaf(blockSize_);
-        tree_[(nodesCount_/2) + i] = leaf;
+        tree_[(nodesCount_/2) + i] = static_cast<HashNode*>(leaf);
 
         grp.add_thread(new boost::thread(boost::bind(&DTLeaf::init, leaf, file, offset, length)));
     }
@@ -154,9 +159,10 @@ FileHashTree::serilize(char* p){
         if(i < nodesCount_/2){ // nodes
             if(tree_[i] == NULL){
                 DTNode node;
-                p = node.serilize(p);
+                p = node.serilize(p);   // serilize an empty node
             }else{
-                DTNode *node = static_cast<DTNode*>(tree_[i]);
+                // TODO: downcast maybe a bad design :(
+                DTNode *node = boost::polymorphic_downcast<DTNode*>(tree_[i]);
                 p = node->serilize(p);
             }
         }else{                   // leaves
@@ -164,7 +170,7 @@ FileHashTree::serilize(char* p){
                 DTLeaf leaf(blockSize_);
                 p = leaf.serilize(p);
             }else{
-                DTLeaf* leaf = static_cast<DTLeaf*>(tree_[i]);
+                DTLeaf* leaf = boost::polymorphic_downcast<DTLeaf*>(tree_[i]);
                 p = leaf->serilize(p);
             }
         }
@@ -193,22 +199,22 @@ FileHashTreeManager::compareTrees_(HashNode* dst[], HashNode* src[], int ptr,
                                    unsigned nodes, unsigned trunks, unsigned blksize){
     if(ptr >= nodes/2){
         // compare leaves
-        DTLeaf* dstLeaf = static_cast<DTLeaf*>(dst[ptr]);
-        DTLeaf* srcLeaf = static_cast<DTLeaf*>(src[ptr]);
+        const DTLeaf* dstLeaf = boost::polymorphic_downcast<DTLeaf*>(dst[ptr]);
+        const DTLeaf* srcLeaf = boost::polymorphic_downcast<DTLeaf*>(src[ptr]);
 
         off_t baseoff = (ptr - (nodes/2)) * trunks;
         off_t offset = baseoff;
 
-        DTLeaf::BlockInfo& srclb = srcLeaf->lastblk();
+        const DTLeaf::BlockInfo& srclb = srcLeaf->lastblk();
 
         if(srcLeaf != NULL){
-            DTLeaf::BlockList& srcBlocks = srcLeaf->blocks();
-            DTLeaf::BlockList::iterator srcItr = srcBlocks.begin();
+            const DTLeaf::BlockList& srcBlocks = srcLeaf->blocks();
+            DTLeaf::BlockList::const_iterator srcItr = srcBlocks.begin();
 
             if(dstLeaf != NULL){
                 if(dstLeaf->digest() != srcLeaf->digest()){
-                    DTLeaf::BlockList::iterator dstItr;
-                    DTLeaf::BlockList& dstBlocks = dstLeaf->blocks();
+                    DTLeaf::BlockList::const_iterator dstItr;
+                    const DTLeaf::BlockList& dstBlocks = dstLeaf->blocks();
                     for (dstItr = dstBlocks.begin() ;
                          dstItr != dstBlocks.end() && srcItr != srcBlocks.end();
                          ++dstItr, ++srcItr, ++offset) {
